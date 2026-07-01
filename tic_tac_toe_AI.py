@@ -1,34 +1,33 @@
+#Tic Tac Toe AI
 import math
-
-board = [' ' for _ in range(9)]
-
+board = [" " for _ in range(9)]
+# Display the game board
 def print_board():
     print()
-    print(board[0] + " | " + board[1] + " | " + board[2])
-    print("--+---+--")
-    print(board[3] + " | " + board[4] + " | " + board[5])
-    print("--+---+--")
-    print(board[6] + " | " + board[7] + " | " + board[8])
+    for i in range(0, 9, 3):
+        print(f" {board[i]} | {board[i+1]} | {board[i+2]} ")
+        if i < 6:
+            print("---+---+---")
     print()
 
+# Check winner
 def check_winner(player):
     win_positions = [
-        [0,1,2],[3,4,5],[6,7,8],
-        [0,3,6],[1,4,7],[2,5,8],
-        [0,4,8],[2,4,6]
+        [0,1,2], [3,4,5], [6,7,8],
+        [0,3,6], [1,4,7], [2,5,8],
+        [0,4,8], [2,4,6]
     ]
-    for pos in win_positions:
-        if all(board[i] == player for i in pos):
-            return True
-    return False
+    return any(all(board[i] == player for i in pos) for pos in win_positions)
 
+# Check draw
 def is_draw():
-    return ' ' not in board
+    return " " not in board
 
+# Minimax Algorithm
 def minimax(is_max):
-    if check_winner('O'):
+    if check_winner("O"):
         return 1
-    if check_winner('X'):
+    if check_winner("X"):
         return -1
     if is_draw():
         return 0
@@ -36,78 +35,93 @@ def minimax(is_max):
     if is_max:
         best = -math.inf
         for i in range(9):
-            if board[i] == ' ':
-                board[i] = 'O'
-                score = minimax(False)
-                board[i] = ' '
-                best = max(best, score)
+            if board[i] == " ":
+                board[i] = "O"
+                best = max(best, minimax(False))
+                board[i] = " "
         return best
     else:
         best = math.inf
         for i in range(9):
-            if board[i] == ' ':
-                board[i] = 'X'
-                score = minimax(True)
-                board[i] = ' '
-                best = min(best, score)
+            if board[i] == " ":
+                board[i] = "X"
+                best = min(best, minimax(True))
+                board[i] = " "
         return best
 
+# AI Move
 def ai_move():
     best_score = -math.inf
-    move = -1
+    best_move = -1
+
     for i in range(9):
-        if board[i] == ' ':
-            board[i] = 'O'
+        if board[i] == " ":
+            board[i] = "O"
             score = minimax(False)
-            board[i] = ' '
+            board[i] = " "
+
             if score > best_score:
                 best_score = score
-                move = i
-    board[move] = 'O'
+                best_move = i
 
+    board[best_move] = "O"
+
+# Player Move
 def player_move():
     while True:
         try:
-            move = int(input("Enter position (1-9): ")) - 1
-            if 0 <= move <= 8 and board[move] == ' ':
-                board[move] = 'X'
+            move = int(input("Enter your move (1-9): ")) - 1
+
+            if 0 <= move < 9 and board[move] == " ":
+                board[move] = "X"
                 break
             else:
-                print("Invalid move. Try again.")
+                print("Invalid move! Try again.")
+
         except ValueError:
-            print("Please enter a number between 1 and 9.")
+            print("Please enter a valid number.")
 
-print("=== Tic-Tac-Toe AI ===")
-print("You are X")
-print("Positions:")
-print("1 | 2 | 3")
-print("--+---+--")
-print("4 | 5 | 6")
-print("--+---+--")
-print("7 | 8 | 9")
+# Main Game
+def main():
+    print("=" * 40)
+    print("       TIC TAC TOE AI")
+    print("=" * 40)
+    print("You are X | AI is O\n")
 
-while True:
-    print_board()
-    player_move()
+    print("Board Positions")
+    print("1 | 2 | 3")
+    print("--+---+--")
+    print("4 | 5 | 6")
+    print("--+---+--")
+    print("7 | 8 | 9\n")
 
-    if check_winner('X'):
+    while True:
         print_board()
-        print("Congratulations! You win!")
-        break
 
-    if is_draw():
-        print_board()
-        print("It's a Draw!")
-        break
+        player_move()
 
-    ai_move()
+        if check_winner("X"):
+            print_board()
+            print("Congratulations! You Win!")
+            break
 
-    if check_winner('O'):
-        print_board()
-        print("AI Wins!")
-        break
+        if is_draw():
+            print_board()
+            print("It's a Draw!")
+            break
 
-    if is_draw():
-        print_board()
-        print("It's a Draw!")
-        break
+        print("\nAI is making a move...\n")
+        ai_move()
+
+        if check_winner("O"):
+            print_board()
+            print("AI Wins!")
+            break
+
+        if is_draw():
+            print_board()
+            print("It's a Draw!")
+            break
+
+if __name__ == "__main__":
+    main()
